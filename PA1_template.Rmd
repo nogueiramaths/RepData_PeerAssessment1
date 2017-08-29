@@ -1,25 +1,155 @@
 ---
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
+title: "Course Project 1 - Reproducible Research"
+author: "Matheus Nogueira"
+date: "8/28/2017"
+output: html_document
 ---
 
+```{r setup, include=FALSE}
+rm(list = ls())
+knitr::opts_chunk$set(echo = TRUE)
+setwd("~/Dropbox/COURSERA/1. REPRODUCIBLE RESEARCH/Project 1")
+```
 
-## Loading and preprocessing the data
+#Loading and preprocessing the data
+
+This is the code to load the data.
+```{r loading Data}
+data <- read.csv("activity.csv")
+summary(data)
+```
+
+#What is mean total number of steps taken per day?
+
+Now, let's take a look at the number of steps taken per day:
+
+```{r steps per day}
+days <- levels(data[,2])
+steps_per_day <- rep(0,length(days))
+for (i in 1:length(days)) {
+        steps_per_day[i] <- sum(data[which(data[,2]==days[i]),1],na.rm = TRUE)
+}
+SPD <- as.data.frame(cbind(days,steps_per_day))
+```
+
+The histogram of the total number of steps taken each day.
+```{r hist steps per day}
+hist(steps_per_day)
+```
+
+
+```{r mean and median}
+mean_SPD <- round(mean(steps_per_day),digits = 2)
+median_SPD <- round(median(steps_per_day),digits = 2)
+```
+
+The mean of steps taken per day is `r mean_SPD` and the median is `r median_SPD` 
+
+#What is the average daily activity pattern?
+
+Now, let's change the paradigma and take a look at the daily activity patern.
+First, we calculate the average number of steps taken, averaged across all days.
+
+```{r steps per daily interval}
+intervals <- levels(as.factor(data[,3]))
+steps_per_intervals <- rep(0,length(intervals))
+for (i in 1:length(intervals)) {
+        steps_per_intervals[i] <- mean(data[which(data[,3]==intervals[i]),1],na.rm = TRUE)
+}
+SPI <- as.data.frame(cbind(intervals,steps_per_intervals))
+```
+
+This is the plot 5-minute interval Vs average number of steps taken
+
+```{r plot steps Vs intervals }
+plot(intervals,steps_per_intervals,type = "l")
+```
+
+
+```{r max intervals steps}
+maxIntervalSteps <- intervals[which.max(steps_per_intervals)]
+```
+
+The 5-minute interval, on average across all the days in the dataset, that contains the maximum number of steps is `r maxIntervalSteps`.
+
+#Imputing missing values
+
+```{r number of NAs}
+NumberOfNAs <- nrow(data[is.na(data[,1]),])
+```
+
+The number of NA observations is `r NumberOfNAs`.
+
+The strategy for imputing missing values is the median of the interval.
+```{r imputing NAs}
+new_data <- data
+
+for (i in which(is.na(data[,1])==TRUE)) {
+        interval <- data[i,3]
+        steps_median <- median(data[which(data[,3]==interval),1],na.rm = TRUE)
+        new_data[i,1] <- steps_median
+}
+```
+
+Histogram, mean e median of total number of steps taken per day AFTER MISSING DATA IMPUTATION.
+```{r steps per day 2}
+days <- levels(new_data[,2])
+steps_per_day <- rep(0,length(days))
+for (i in 1:length(days)) {
+        steps_per_day[i] <- sum(new_data[which(new_data[,2]==days[i]),1],na.rm = TRUE)
+}
+```
+
+The histogram of the total number of steps taken each day AFTER MISSING DATA IMPUTATION.
+```{r hist steps per day 2}
+hist(steps_per_day)
+```
+
+
+```{r mean and median 2}
+mean_SPD <- round(mean(steps_per_day),digits = 2)
+median_SPD <- round(median(steps_per_day),digits = 2)
+```
+
+The mean of steps taken per day after missing data imputation is `r mean_SPD` and the median is `r median_SPD`. **We see that only the mean is different from the first part of this report.**
+
+#Are there differences in activity patterns between weekdays and weekends?
+
+Creating the variable weekday/weekend:
+
+```{r weekday/weekend}
+dayweek <- weekdays(as.Date(new_data[,2]))
+sat <- which(dayweek=="Saturday")
+sun <- which(dayweek=="Sunday")
+
+weekend <- union(sat,sun)
+weekday_weekend <- rep("weekday",nrow(new_data))
+weekday_weekend[weekend] <- "weekend"
+
+new_data$weekday_weekend <- weekday_weekend
+```
+
+Time series plot for weekday and weekend:
+
+```{r steps per daily interval 2}
+intervals <- levels(as.factor(new_data[,3]))
+spi_weekday <- rep(0,length(intervals))
+spi_weekend <- rep(0,length(intervals))
+
+data_weekday <- new_data[which(new_data[,4]=="weekday"),]
+data_weekend <- new_data[which(new_data[,4]=="weekend"),]
+
+for (i in 1:length(intervals)) {
+        spi_weekday[i] <- mean(data_weekday[which(data_weekday[,3]==intervals[i]),1])
+        spi_weekend[i] <- mean(data_weekend[which(data_weekend[,3]==intervals[i]),1])
+}
+```
+
+```{r plot weekday/weekend}
+par(mfrow=c(2,1))
+plot(intervals,spi_weekday,type="l",main = "WEEKDAY")
+plot(intervals,spi_weekend,type="l",main = "WEEKEND")
+```
 
 
 
-## What is mean total number of steps taken per day?
-
-
-
-## What is the average daily activity pattern?
-
-
-
-## Imputing missing values
-
-
-
-## Are there differences in activity patterns between weekdays and weekends?
