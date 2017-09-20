@@ -2,6 +2,8 @@
 Matheus Nogueira  
 8/28/2017  
 
+
+
 #Loading and preprocessing the data
 
 This is the code to load the data.
@@ -39,7 +41,7 @@ The histogram of the total number of steps taken each day.
 hist(steps_per_day$steps,main = "Histogram of the total number of steps taken each day",xlab = "Number of steps per day", breaks = 10)
 ```
 
-![](PA1_template_files/figure-html/hist steps per day-1.png)
+![](PA1_template_files/figure-html/hist_steps_per_day-1.png)<!-- -->
 
 Calculating mean and median of total number of steps taken each day.
 
@@ -82,7 +84,7 @@ This is the plot 5-minute interval Vs average number of steps taken
 plot(steps_per_intervals$interval,steps_per_intervals$steps,type = "l",xlab="Intervals",ylab="Steps",main="5-minute interval and the average number of steps taken")
 ```
 
-![](PA1_template_files/figure-html/plot steps Vs intervals-1.png)<!-- -->
+![](PA1_template_files/figure-html/plot_steps_Vs_intervals-1.png)<!-- -->
 
 
 
@@ -136,7 +138,7 @@ The histogram of the total number of steps taken each day AFTER MISSING DATA IMP
 hist(new_steps_per_day$steps,main = "Histogram of the total number of steps taken each day after MISSING DATA IMPUTATION",xlab = "Number of steps per day", breaks = 10)
 ```
 
-![](PA1_template_files/figure-html/hist steps per day 2-1.png)<!-- -->
+![](PA1_template_files/figure-html/hist_steps_per_day_2-1.png)<!-- -->
 
 
 
@@ -202,7 +204,4 @@ plot(intervals,spi_weekday,type="l",main = "WEEKDAY",xlab="Intervals",ylab="Step
 plot(intervals,spi_weekend,type="l",main = "WEEKEND",xlab="Intervals",ylab="Steps",lwd=2)
 ```
 
-![](PA1_template_files/figure-html/plot weekday/weekend-1.png)<!-- -->
-
-
-knit2html()
+![](PA1_template_files/figure-html/plot_weekday_weekend-1.png)<!-- -->
