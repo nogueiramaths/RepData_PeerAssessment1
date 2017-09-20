@@ -2,7 +2,7 @@
 Matheus Nogueira  
 8/28/2017  
 
-![Sample panel plot](instructions_fig/sample_panelplot.png) 
+![AAA](instructions_fig/sample_panelplot.png) 
 
 #Loading and preprocessing the data
 
