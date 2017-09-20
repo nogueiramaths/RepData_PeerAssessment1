@@ -21,26 +21,27 @@ summary(data)
 
 #What is mean total number of steps taken per day?
 
-Now, let's take a look at the number of steps taken per day:
+Now, let's take a look at the number of steps taken per day with dplyr:
 
-```{r steps per day}
-days <- levels(data[,2])
-steps_per_day <- rep(0,length(days))
-for (i in 1:length(days)) {
-        steps_per_day[i] <- sum(data[which(data[,2]==days[i]),1],na.rm = TRUE)
-}
-SPD <- as.data.frame(cbind(days,steps_per_day))
+```{r steps per day,message=FALSE}
+library(dplyr)
+steps_per_day <- data %>% group_by(date) %>% summarise(steps=sum(steps))
 ```
 
 The histogram of the total number of steps taken each day.
+
 ```{r hist steps per day}
-hist(steps_per_day)
+hist(steps_per_day$steps,main = "Histogram of the total number of steps taken each day",xlab = "Number of steps per day", breaks = 10)
 ```
 
+Calculating mean and median of total number of steps taken each day.
 
 ```{r mean and median}
-mean_SPD <- round(mean(steps_per_day),digits = 2)
-median_SPD <- round(median(steps_per_day),digits = 2)
+mean_SPD <- round(mean(steps_per_day$steps[!is.na(steps_per_day$steps)]),digits = 2)
+median_SPD <- round(median(steps_per_day$steps[!is.na(steps_per_day$steps)]),digits = 2)
+
+mean_SPD
+median_SPD
 ```
 
 The mean of steps taken per day is `r mean_SPD` and the median is `r median_SPD` 
@@ -51,23 +52,19 @@ Now, let's change the paradigma and take a look at the daily activity patern.
 First, we calculate the average number of steps taken, averaged across all days.
 
 ```{r steps per daily interval}
-intervals <- levels(as.factor(data[,3]))
-steps_per_intervals <- rep(0,length(intervals))
-for (i in 1:length(intervals)) {
-        steps_per_intervals[i] <- mean(data[which(data[,3]==intervals[i]),1],na.rm = TRUE)
-}
-SPI <- as.data.frame(cbind(intervals,steps_per_intervals))
+steps_per_intervals <- data[!is.na(data$steps),] %>% group_by(interval) %>% summarise(steps=mean(steps))
 ```
 
 This is the plot 5-minute interval Vs average number of steps taken
 
 ```{r plot steps Vs intervals }
-plot(intervals,steps_per_intervals,type = "l")
+plot(steps_per_intervals$interval,steps_per_intervals$steps,type = "l",xlab="Intervals",ylab="Steps",main="5-minute interval and the average number of steps taken")
 ```
 
 
 ```{r max intervals steps}
-maxIntervalSteps <- intervals[which.max(steps_per_intervals)]
+maxIntervalSteps <- steps_per_intervals$interval[which.max(steps_per_intervals$steps)]
+maxIntervalSteps
 ```
 
 The 5-minute interval, on average across all the days in the dataset, that contains the maximum number of steps is `r maxIntervalSteps`.
@@ -76,42 +73,43 @@ The 5-minute interval, on average across all the days in the dataset, that conta
 
 ```{r number of NAs}
 NumberOfNAs <- nrow(data[is.na(data[,1]),])
+NumberOfNAs
 ```
 
 The number of NA observations is `r NumberOfNAs`.
 
-The strategy for imputing missing values is the median of the interval.
+The strategy for imputing missing values is the mean of the interval.
+
 ```{r imputing NAs}
 new_data <- data
 
-for (i in which(is.na(data[,1])==TRUE)) {
-        interval <- data[i,3]
-        steps_median <- median(data[which(data[,3]==interval),1],na.rm = TRUE)
-        new_data[i,1] <- steps_median
+for (i in which(is.na(data$steps)==TRUE)) {
+        interval <- data$interval[i]
+        new_data$steps[i] <- steps_per_intervals$steps[which(steps_per_intervals$interval==interval)]
 }
 ```
 
 Histogram, mean e median of total number of steps taken per day AFTER MISSING DATA IMPUTATION.
+
 ```{r steps per day 2}
-days <- levels(new_data[,2])
-steps_per_day <- rep(0,length(days))
-for (i in 1:length(days)) {
-        steps_per_day[i] <- sum(new_data[which(new_data[,2]==days[i]),1],na.rm = TRUE)
-}
+new_steps_per_day <- new_data %>% group_by(date) %>% summarise(steps=sum(steps))
 ```
 
 The histogram of the total number of steps taken each day AFTER MISSING DATA IMPUTATION.
 ```{r hist steps per day 2}
-hist(steps_per_day)
+hist(new_steps_per_day$steps,main = "Histogram of the total number of steps taken each day after MISSING DATA IMPUTATION",xlab = "Number of steps per day", breaks = 10)
 ```
 
 
 ```{r mean and median 2}
-mean_SPD <- round(mean(steps_per_day),digits = 2)
-median_SPD <- round(median(steps_per_day),digits = 2)
+new_mean_SPD <- round(mean(new_steps_per_day$steps),digits = 2)
+new_median_SPD <- round(median(new_steps_per_day$steps),digits = 2)
+
+new_mean_SPD
+new_median_SPD
 ```
 
-The mean of steps taken per day after missing data imputation is `r mean_SPD` and the median is `r median_SPD`. **We see that only the mean is different from the first part of this report.**
+The mean of steps taken per day after missing data imputation is `r new_mean_SPD` and the median is `r new_median_SPD`. **We see that only the median is different from the first part of this report.**
 
 #Are there differences in activity patterns between weekdays and weekends?
 
@@ -147,8 +145,8 @@ for (i in 1:length(intervals)) {
 
 ```{r plot weekday/weekend}
 par(mfrow=c(2,1))
-plot(intervals,spi_weekday,type="l",main = "WEEKDAY")
-plot(intervals,spi_weekend,type="l",main = "WEEKEND")
+plot(intervals,spi_weekday,type="l",main = "WEEKDAY",xlab="Intervals",ylab="Steps",lwd=2)
+plot(intervals,spi_weekend,type="l",main = "WEEKEND",xlab="Intervals",ylab="Steps",lwd=2)
 ```
 
 
