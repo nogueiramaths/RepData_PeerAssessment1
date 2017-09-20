@@ -84,7 +84,7 @@ This is the plot 5-minute interval Vs average number of steps taken
 plot(steps_per_intervals$interval,steps_per_intervals$steps,type = "l",xlab="Intervals",ylab="Steps",main="5-minute interval and the average number of steps taken")
 ```
 
-![](PA1_template_files/figure-html/plot steps Vs intervals-1.png)<!-- -->
+![Plot](PA1_template_files/figure-html/plot steps Vs intervals-1.png)<!-- -->
 
 
 
